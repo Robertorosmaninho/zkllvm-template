@@ -1,0 +1,2 @@
+/home/robertorosmaninho/rv/zk-experiments/proof-market-toolchain/build/bin/proof-generator/proof-generator --proof_out=test_output.bin --circuit_input=test_statement.json --public_input=Globals/noglobals_input.json
+68015 Segmentation fault      (core dumped) /home/robertorosmaninho/rv/zk-experiments/proof-market-toolchain/build/bin/proof-generator/proof-generator --proof_out=test_output.bin --circuit_input=test_statement.json --public_input=Globals/noglobals_input.json

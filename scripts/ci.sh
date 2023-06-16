@@ -30,6 +30,8 @@ check_file_exists() {
 
 # Compile source code into a circuit
 compile() {
+    example_name=$1
+    echo "Compiling $example_name"
     if [ "$USE_DOCKER" = true ] ; then
         cd "$REPO_ROOT"
         $DOCKER run $DOCKER_OPTS \
@@ -38,16 +40,17 @@ compile() {
           --user $(id -u ${USER}):$(id -g ${USER}) \
           --volume $(pwd):/opt/zkllvm-template \
           ghcr.io/nilfoundation/zkllvm-template:latest \
-          sh -c "bash ./scripts/ci.sh compile"
+          sh -c "bash ./scripts/ci.sh compile $example_name"
         cd -
     else
         rm -rf "$REPO_ROOT/build"
         mkdir -p "$REPO_ROOT/build"
         cd "$REPO_ROOT/build"
         cmake -DCIRCUIT_ASSEMBLY_OUTPUT=TRUE ..
-        make template
+        make "$example_name"
         cd -
-        check_file_exists "$REPO_ROOT/build/src/template.ll"
+        cp "$REPO_ROOT/src/$example_name/${example_name}_input.json"  "$REPO_ROOT/build/src/$example_name/"
+        check_file_exists "$REPO_ROOT/build/src/$example_name/$example_name.ll"
     fi
 }
 
@@ -77,12 +80,14 @@ run_assigner() {
         check_file_exists "$REPO_ROOT/build/template.crct"
         check_file_exists "$REPO_ROOT/build/template.tbl"
     fi
-  }
+}
 
 # Use the Proof Market toolchain to pack circuit into a statement
 # that can later be used to produce a proof locally or sent to the
 # Proof Market.
 build_statement() {
+    example_name=$1
+    echo "Building statement $example_name"
     if [ "$USE_DOCKER" = true ] ; then
         cd "$REPO_ROOT"
         $DOCKER run $DOCKER_OPTS \
@@ -91,14 +96,14 @@ build_statement() {
           --user $(id -u ${USER}):$(id -g ${USER}) \
           --volume $(pwd):/opt/zkllvm-template \
           ghcr.io/nilfoundation/proof-market-toolchain:latest \
-          sh -c "bash /opt/zkllvm-template/scripts/ci.sh build_statement"
+          sh -c "bash /opt/zkllvm-template/scripts/ci.sh build_statement $example_name"
         cd -
     else
         python3 /proof-market-toolchain/scripts/prepare_statement.py \
-            --circuit "$REPO_ROOT/build/src/template.ll" \
+            --circuit "$REPO_ROOT/build/src/$example_name/$example_name.ll" \
             --name template --type placeholder-zkllvm \
-            --output "$REPO_ROOT/build/template.json"
-        check_file_exists "$REPO_ROOT/build/template.json"
+            --output "$REPO_ROOT/build/src/$example_name/$example_name.json"
+        check_file_exists "$REPO_ROOT/build/src/$example_name/$example_name.json"
     fi
 }
 
@@ -107,6 +112,8 @@ build_statement() {
 # ./src/main.inp
 # ./src/main-input.json
 prove() {
+    example_name=$1
+    echo "Proving $example_name"
     if [ "$USE_DOCKER" = true ] ; then
         cd "$REPO_ROOT"
         $DOCKER run $DOCKER_OPTS \
@@ -115,24 +122,24 @@ prove() {
           --user $(id -u ${USER}):$(id -g ${USER}) \
           --volume $(pwd):/opt/zkllvm-template \
           ghcr.io/nilfoundation/proof-market-toolchain:latest \
-          sh -c "bash /opt/zkllvm-template/scripts/ci.sh prove"
+          sh -c "bash /opt/zkllvm-template/scripts/ci.sh prove $example_name"
         cd -
     else
         mkdir -p .config
         touch .config/config.ini
         proof-generator \
-            --circuit_input="$REPO_ROOT/build/template.json" \
-            --public_input="$REPO_ROOT/src/main-input.json" \
-            --proof_out="$REPO_ROOT/build/template.proof"
-        check_file_exists "$REPO_ROOT/build/template.proof"
+            --circuit_input="$REPO_ROOT/build/src/$example_name/$example_name.json" \
+            --public_input="$REPO_ROOT/build/src/$example_name/${example_name}_input.json" \
+            --proof_out="$REPO_ROOT/build/src/$example_name/$example_name.proof"
+        check_file_exists "$REPO_ROOT/build/src/$example_name/$example_name.proof"
     fi
 }
 
 run_all() {
-    compile
-    run_assigner
-    build_statement
-    prove
+    compile "$@"
+    #run_assigner
+    build_statement "$@"
+    prove "$@"
 }
 
 USE_DOCKER=false
@@ -141,15 +148,31 @@ SUBCOMMAND=run_all
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -d|--docker) USE_DOCKER=true ;;
-        all) SUBCOMMAND=run_all ;;
-        compile) SUBCOMMAND=compile ;;
+        all)
+            SUBCOMMAND=run_all
+            shift
+            break
+            ;;
+        compile)
+            SUBCOMMAND=compile
+            shift
+            break
+            ;;
         run_assigner) SUBCOMMAND=run_assigner ;;
-        build_statement) SUBCOMMAND=build_statement ;;
-        prove) SUBCOMMAND=prove ;;
+        build_statement)
+            SUBCOMMAND=build_statement
+            shift
+            break
+            ;;
+        prove)
+            SUBCOMMAND=prove
+            shift
+            break
+            ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
     shift
 done
 
 echo "Running ${SUBCOMMAND}"
-$SUBCOMMAND
+$SUBCOMMAND "$@"

@@ -1,0 +1,6 @@
+With the char input, we get the bad alloc error.
+
+```
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+```
