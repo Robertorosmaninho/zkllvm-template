@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euxo pipefail
+set -euo pipefail
 
 # define dirs so that we can run scripts from any directory without shifting filesystem paths
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -14,17 +14,21 @@ else
     DOCKER_OPTS='--detach-keys= --userns=keep-id'
 fi
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 # checking files that should be produced
 # on all steps of the pipeline
 check_file_exists() {
     FILE1="${1}"
     if [ ! -e "$FILE1" ]
     then
-        echo "File $FILE1 was not created" >&2
+        echo -e "${RED}File $FILE1 was not created\n ${NC}" >&2
         exit 1
     else
-        echo "File $FILE1 created successfully"
-        ls -hal "$FILE1"
+        echo -e "File $FILE1 created successfully\n"
+       # ls -hal "$FILE1"
     fi
 }
 
@@ -114,6 +118,7 @@ build_statement() {
 prove() {
     example_name=$1
     echo "Proving $example_name"
+    echo -e "${BLUE}"
     if [ "$USE_DOCKER" = true ] ; then
         cd "$REPO_ROOT"
         $DOCKER run $DOCKER_OPTS \
@@ -131,6 +136,7 @@ prove() {
             --circuit_input="$REPO_ROOT/build/src/$example_name/$example_name.json" \
             --public_input="$REPO_ROOT/build/src/$example_name/${example_name}_input.json" \
             --proof_out="$REPO_ROOT/build/src/$example_name/$example_name.proof"
+        echo -e "${NC}"
         check_file_exists "$REPO_ROOT/build/src/$example_name/$example_name.proof"
     fi
 }
