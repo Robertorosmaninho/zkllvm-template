@@ -137,8 +137,9 @@ void testMap() {
   myMap.insert("three", 3, mapHead);
 
   // Test contains
-  assert(myMap.contains("two", mapHead) == 1);
-  assert(myMap.contains("four", mapHead) == 0);
+  assert(myMap.contains("two", mapHead));
+  assert(myMap.contains("three", mapHead));
+  assert(!myMap.contains("four", mapHead));
 
   // Test at
   assert(myMap.at("two", mapHead) == 2);
@@ -172,7 +173,7 @@ void testDeque() {
   assert(myDeque.front(dequeHead) == 5);
   assert(myDeque.back(dequeHead) == 20);
   assert(myDeque.size(dequeHead) == 3);
-  assert(myDeque.empty(dequeHead) == false);
+  assert(!myDeque.empty(dequeHead));
 
 #ifndef ZKLLVM
   std::cout << "All tests passed!" << std::endl;

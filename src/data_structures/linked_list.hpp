@@ -68,5 +68,5 @@ template <typename T> struct LinkedList {
 
   Iterator begin(Node *head) { return Iterator(head); }
 
-  Iterator end() { return Iterator(nullptr); }
+  Iterator end() const { return Iterator(nullptr); }
 };

@@ -13,8 +13,10 @@ using namespace nil::crypto3::algebra::curves;
 circuit_main(typename pallas::base_field_type::value_type a,
              typename pallas::base_field_type::value_type b) {
 
-  testVector();
   testLinkedList();
+  testVector();
+  //testMap();
+  testDeque();
 
   return a + b;
 }
