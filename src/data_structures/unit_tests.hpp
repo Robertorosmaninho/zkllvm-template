@@ -129,8 +129,8 @@ void testMap() {
   std::cout << "Testing Map..." << std::endl;
 #endif
 
-  Map<std::string, int> myMap;
-  LinkedList<Map<std::string, int>::Entry>::Node *mapHead = nullptr;
+  Map<const char *, int> myMap;
+  LinkedList<Map<const char *, int>::Entry>::Node *mapHead = nullptr;
 
   myMap.insert("one", 1, mapHead);
   myMap.insert("two", 2, mapHead);

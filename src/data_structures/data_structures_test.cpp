@@ -15,7 +15,7 @@ circuit_main(typename pallas::base_field_type::value_type a,
 
   testLinkedList();
   testVector();
-  //testMap();
+  testMap();
   testDeque();
 
   return a + b;
