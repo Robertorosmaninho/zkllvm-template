@@ -38,6 +38,15 @@ template <typename T> struct LinkedList {
     }
   }
 
+  T remove_front(Node *&head) {
+    Node *current = head;
+    head = head->next;
+    if (head != nullptr) {
+      head->prev = nullptr;
+    }
+    return current->data;
+  }
+
   struct Iterator {
     Node *current;
 

@@ -17,6 +17,8 @@ circuit_main(typename pallas::base_field_type::value_type a,
   testVector();
   testMap();
   testDeque();
+  testSet();
+  testQueue();
 
   return a + b;
 }
@@ -31,6 +33,10 @@ int main() {
   testMap();
   std::cout << std::endl;
   testDeque();
+  std::cout << std::endl;
+  testSet();
+  std::cout << std::endl;
+  testQueue();
   return 0;
 }
 #endif

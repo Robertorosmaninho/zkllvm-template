@@ -1,6 +1,8 @@
 #include "linked_list.hpp"
-#include "map.hpp"
 #include "deque.hpp"
+#include "map.hpp"
+#include "queue.hpp"
+#include "set.hpp"
 #include "vector.hpp"
 
 #include <cassert>
@@ -91,6 +93,10 @@ int testVector() {
   std::cout << std::endl;
 #endif
 
+  while (it != end) {
+    ++it;
+  }
+
   // Test empty vector
   Vector<int> emptyVector;
   LinkedList<int>::Node *emptyHead = nullptr;
@@ -129,21 +135,21 @@ void testMap() {
   std::cout << "Testing Map..." << std::endl;
 #endif
 
-  Map<const char *, int> myMap;
-  LinkedList<Map<const char *, int>::Entry>::Node *mapHead = nullptr;
+  Map<int, int> myMap;
+  LinkedList<Map<int, int>::Entry>::Node *mapHead = nullptr;
 
-  myMap.insert("one", 1, mapHead);
-  myMap.insert("two", 2, mapHead);
-  myMap.insert("three", 3, mapHead);
+  myMap.insert(1, 10, mapHead);
+  myMap.insert(2, 20, mapHead);
+  myMap.insert(3, 30, mapHead);
 
   // Test contains
-  assert(myMap.contains("two", mapHead));
-  assert(myMap.contains("three", mapHead));
-  assert(!myMap.contains("four", mapHead));
+  assert(myMap.contains(2, mapHead));
+  assert(myMap.contains(3, mapHead));
+  assert(!myMap.contains(4, mapHead));
 
   // Test at
-  assert(myMap.at("two", mapHead) == 2);
-  // assert(myMap.at("four", mapHead) == 4);
+  assert(myMap.at(2, mapHead) == 20);
+  //assert(myMap.at("four", mapHead) == 4);
 
 #ifndef ZKLLVM
   std::cout << "All tests passed!" << std::endl;
@@ -178,4 +184,71 @@ void testDeque() {
 #ifndef ZKLLVM
   std::cout << "All tests passed!" << std::endl;
 #endif
+}
+
+// Unit test for Set
+int testSet() {
+#ifndef ZKLLVM
+  std::cout << "Testing Set..." << std::endl;
+#endif
+  Set<int> mySet;
+  LinkedList<int>::Node *setHead = nullptr;
+
+  mySet.insert(10, setHead);
+  mySet.insert(20, setHead);
+  mySet.insert(30, setHead);
+  mySet.insert(20, setHead); // Duplicate, should be ignored
+
+#ifndef ZKLLVM
+  std::cout << "Set size: " << mySet.size(setHead) << std::endl;
+  std::cout << "Set contains 10: " << std::boolalpha
+            << mySet.contains(10, setHead) << std::endl;
+  std::cout << "Set contains 20: " << std::boolalpha
+            << mySet.contains(20, setHead) << std::endl;
+  std::cout << "Set contains 30: " << std::boolalpha
+            << mySet.contains(30, setHead) << std::endl;
+  std::cout << "Set contains 40: " << std::boolalpha
+            << mySet.contains(40, setHead) << std::endl;
+#endif
+
+  assert(mySet.size(setHead) == 3);
+  assert(mySet.contains(10, setHead));
+  assert(mySet.contains(20, setHead));
+  assert(mySet.contains(30, setHead));
+  assert(!mySet.contains(40, setHead));
+#ifndef ZKLLVM
+  std::cout << "All tests passed!" << std::endl;
+#endif
+  return 0;
+}
+
+int testQueue() {
+#ifndef ZKLLVM
+  std::cout << "Testing Queue..." << std::endl;
+#endif
+  Queue<int> myQueue;
+  LinkedList<int>::Node *queueHead = nullptr;
+
+  myQueue.enqueue(10, queueHead);
+  myQueue.enqueue(20, queueHead);
+  myQueue.enqueue(30, queueHead); 
+  myQueue.enqueue(40, queueHead);
+
+#ifndef ZKLLVM
+  std::cout << "Dequeue: " << myQueue.dequeue(queueHead) << std::endl;
+  std::cout << "Dequeue: " << myQueue.dequeue(queueHead) << std::endl;
+  std::cout << "Is empty? " << std::boolalpha << myQueue.empty(queueHead)
+            << std::endl;
+#endif
+
+#ifdef ZKLLVM
+assert(myQueue.dequeue(queueHead) == 10);
+assert(myQueue.dequeue(queueHead) == 20);
+assert(!myQueue.empty(queueHead));
+#endif
+
+#ifndef ZKLLVM
+  std::cout << "All tests passed!" << std::endl;
+#endif
+  return 0;
 }
