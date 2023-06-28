@@ -51,7 +51,7 @@ compile() {
         mkdir -p "$REPO_ROOT/build"
         cd "$REPO_ROOT/build"
         cmake -DCIRCUIT_ASSEMBLY_OUTPUT=TRUE ..
-        make "$example_name"
+        time make "$example_name"
         cd -
         cp "$REPO_ROOT/src/$example_name/${example_name}_input.json"  "$REPO_ROOT/build/src/$example_name/"
         check_file_exists "$REPO_ROOT/build/src/$example_name/$example_name.ll"
@@ -103,7 +103,7 @@ build_statement() {
           sh -c "bash /opt/zkllvm-template/scripts/ci.sh build_statement $example_name"
         cd -
     else
-        python3 /proof-market-toolchain/scripts/prepare_statement.py \
+        time python3 /proof-market-toolchain/scripts/prepare_statement.py \
             --circuit "$REPO_ROOT/build/src/$example_name/$example_name.ll" \
             --name template --type placeholder-zkllvm \
             --output "$REPO_ROOT/build/src/$example_name/$example_name.json"
@@ -132,7 +132,7 @@ prove() {
     else
         mkdir -p .config
         touch .config/config.ini
-        proof-generator \
+        time proof-generator \
             --circuit_input="$REPO_ROOT/build/src/$example_name/$example_name.json" \
             --public_input="$REPO_ROOT/build/src/$example_name/${example_name}_input.json" \
             --proof_out="$REPO_ROOT/build/src/$example_name/$example_name.proof"
