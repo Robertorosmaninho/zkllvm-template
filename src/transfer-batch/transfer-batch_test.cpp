@@ -1,29 +1,23 @@
 // Modified from the transfer function at
 //   https://docs.soliditylang.org/en/v0.8.17/contracts.html
 
-#include <nil/crypto3/algebra/curves/pallas.hpp>
+int balanceSender = 12345;
+int balanceTo = 200;
+int amount = 10;
+int ret = 0;
 
-#define ITER 10
-//#define ITER 1000
-//#define ITER 5000
+[[circuit]]int transfer(int addressTo) {
 
-using namespace nil::crypto3::algebra::curves;
-
-typename pallas::base_field_type::value_type balanceSender = 10000000;
-typename pallas::base_field_type::value_type balanceTo = 200;
-typename pallas::base_field_type::value_type amount = 10;
-bool res = 0;
-
-[[circuit]] typename pallas::base_field_type::value_type
-  transfer(typename pallas::base_field_type::value_type addressTo) {
-
-  std::size_t iter = 5000; // MAX: a million transfers
-  std::size_t j = 0;
-  while (j < iter) {
-    balanceSender = balanceSender - amount;
-    balanceTo = balanceTo + amount;
-    res = 1; // transfer is successful
-    j = j + 1;
+  int i = 0;
+  while (i < 5000) {
+    if (amount > balanceSender) {
+      ret = 0; // transfer is not successful
+    } else {
+      balanceSender = balanceSender - amount;
+      balanceTo = balanceTo + amount;
+      ret = 1; // transfer is successful
+    }
+    i = i + 1;
   }
 
   return 0;
