@@ -106,7 +106,8 @@ build_statement() {
         time python3 /proof-market-toolchain/scripts/prepare_statement.py \
             --circuit "$REPO_ROOT/build/src/$example_name/$example_name.ll" \
             --name template --type placeholder-zkllvm \
-            --output "$REPO_ROOT/build/src/$example_name/$example_name.json"
+            --output "$REPO_ROOT/build/src/$example_name/$example_name.json" \
+            --public
         check_file_exists "$REPO_ROOT/build/src/$example_name/$example_name.json"
     fi
 }
@@ -130,8 +131,8 @@ prove() {
           sh -c "bash /opt/zkllvm-template/scripts/ci.sh prove $example_name"
         cd -
     else
-        mkdir -p .config
-        touch .config/config.ini
+        mkdir -p /root/.config
+        touch /root/.config/config.ini
         time proof-generator \
             --circuit_input="$REPO_ROOT/build/src/$example_name/$example_name.json" \
             --public_input="$REPO_ROOT/build/src/$example_name/${example_name}_input.json" \
